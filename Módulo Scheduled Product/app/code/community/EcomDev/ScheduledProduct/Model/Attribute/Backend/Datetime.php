@@ -33,42 +33,49 @@ class EcomDev_ScheduledProduct_Model_Attribute_Backend_Datetime extends Mage_Eav
     public function beforeSave($object)
     {
         parent::beforeSave($object);
-        $code = $this->getAttribute()->getAttributeCode();
-        $compareResult = $this->compareDateToCurrent($object->getData($code));
+   
 		if($object->getData( self::ATTRIBUTE_STATUS)!= Mage_Catalog_Model_Product_Status::STATUS_DISABLED){
 		
 			if($object->getData('plano')!=""){
-			
+			    $plano = $this->getOptionLabel('plano',$object->getData('plano')); //$object->getData('plano')
+				
+				if( $plano=='30 dias'){ // 30dias
+						$offset=30;
+					}
+					if( $plano=='60 dias'){ // 60dias
+						$offset=60;
+					}
+					if( $plano=='90 dias'){ // 90dias
+						$offset=90;
+					}
+				
 				if($object->getData(self::ATTRIBUTE_ACTIVATION_DATE)==''){
 					
 					$object->setData(self::ATTRIBUTE_ACTIVATION_DATE,strtotime('now'));
 					$ACTIVATION_DATE = $object->getData(self::ATTRIBUTE_ACTIVATION_DATE);
-					if($object->getData('plano')=='5'){ // 30dias
-					$object->setData(self::ATTRIBUTE_EXPIRY_DATE, strtotime('+30 day', $ACTIVATION_DATE) );
-					}
-					if($object->getData('plano')=='4'){ // 60dias
-					$object->setData(self::ATTRIBUTE_EXPIRY_DATE, strtotime('+60 day', $ACTIVATION_DATE) );
-					}
-					if($object->getData('plano')=='3'){ // 90dias
-					$object->setData(self::ATTRIBUTE_EXPIRY_DATE, strtotime('+90 day', $ACTIVATION_DATE) );
-					}
+
+						$object->setData(self::ATTRIBUTE_EXPIRY_DATE, strtotime('+'.$offset.' day', $ACTIVATION_DATE) );
+					
 				}else{
 					
 					$ACTIVATION_DATE =new Zend_Date($object->getData(self::ATTRIBUTE_ACTIVATION_DATE,  "dd-MM-yyyy HH:mm:ss"));
+	                    $object->setData(self::ATTRIBUTE_EXPIRY_DATE,$ACTIVATION_DATE->addDay($offset) );
 				
-					if($object->getData('plano')=='5'){ // 30dias
+					/*if( $plano=='30 dias'){ // 30dias
 					 $object->setData(self::ATTRIBUTE_EXPIRY_DATE,$ACTIVATION_DATE->addDay(30) );
 					}
-					if($object->getData('plano')=='4'){ // 60dias
+					if( $plano=='60 dias'){ // 60dias
 					 $object->setData(self::ATTRIBUTE_EXPIRY_DATE,$ACTIVATION_DATE->addDay(60) );
 					}
-					if($object->getData('plano')=='3'){ // 90dias
+					if( $plano=='90 dias'){ // 90dias
 					 $object->setData(self::ATTRIBUTE_EXPIRY_DATE,$ACTIVATION_DATE->addDay(90) );
-					}
+					}*/
 				}
 			}
 		}
 		
+		$code = $this->getAttribute()->getAttributeCode();
+        $compareResult = $this->compareDateToCurrent($object->getData($code));
         if ($compareResult !== false) {
             // If the date is set
             if (($compareResult < 0 && $code == self::ATTRIBUTE_ACTIVATION_DATE) ||
@@ -147,4 +154,44 @@ class EcomDev_ScheduledProduct_Model_Attribute_Backend_Datetime extends Mage_Eav
         }
         return parent::afterLoad($object);
     }
+	
+	public function getOptionId($attribute_code, $label)
+	{
+		$attribute_model         = Mage::getModel('eav/entity_attribute');
+		$attribute_options_model = Mage::getModel('eav/entity_attribute_source_table');
+		$attribute_code          = $attribute_model->getIdByCode('catalog_product', $attribute_code);
+		$attribute               = $attribute_model->load($attribute_code);
+		$attribute_table         = $attribute_options_model->setAttribute($attribute);
+		$options                 = $attribute_options_model->getAllOptions(false);
+		foreach ($options as $option)
+		{
+		if ($option['label'] == $label)
+		 {
+		  $optionId = $option['value'];
+		  break;
+		 }
+		}
+		return $optionId;
+	}
+	public function getOptionLabel($attribute_code, $id)
+	{
+		$attribute_model         = Mage::getModel('eav/entity_attribute');
+		$attribute_options_model = Mage::getModel('eav/entity_attribute_source_table');
+		$attribute_code          = $attribute_model->getIdByCode('catalog_product', $attribute_code);
+		$attribute               = $attribute_model->load($attribute_code);
+		$attribute_table         = $attribute_options_model->setAttribute($attribute);
+		$options                 = $attribute_options_model->getAllOptions(false);
+		foreach ($options as $option)
+		{
+		if ($option['value'] == $id)
+		 {
+		  $optionLabel = $option['label'];
+		  break;
+		 }
+		}
+		return $optionLabel;
+	}
+	
+	
+	
 }
