@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Foo_Bar>
+            <version>1.0.0</version>
+        </Foo_Bar>
+    </modules>
+     
+    <global>
+        <helpers>
+            <foo_bar>
+                <!-- This is where we define our helper directory -->
+                <class>Foo_Bar_Helper</class>
+            </foo_bar>
+        </helpers>
+                    
+        <blocks>
+            <foo_bar>
+                <!-- Set a block definition and lookup directory -->
+                <class>Foo_Bar_Block</class>
+            </foo_bar>
+        </blocks>
+         
+        <models>
+            <foo_bar>
+                <!-- This is where we define our model directory -->
+                <class>Foo_Bar_Model</class>
+                <!-- Define a resource to create a custom table -->
+                <resourceModel>foo_bar_mysql4</resourceModel>
+            </foo_bar>
+             
+            <!-- Here's our resource model we'll use to create a database table -->
+            <foo_bar_mysql4>
+                <class>Foo_Bar_Model_Mysql4</class>
+                <entities>
+                    <!-- Let's define our table, we'll call it with the baz name, but the real table is foo_bar_baz -->
+                    <!-- After we define our entity, we can call it with our model by calling foo_bar/baz -->
+                    <baz>
+                        <table>foo_bar_baz</table>
+                    </baz>
+                </entities>
+            </foo_bar_mysql4>
+        </models>
+         
+        <!-- And finally we define our resource setup script -->
+        <resources>
+            <foo_bar_setup>
+                <setup>
+                    <module>Foo_Bar</module>
+                </setup>
+            </foo_bar_setup>
+        </resources>
+    </global>
+     
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <!-- This is how we load our Adminhtml controllers -->
+                    <modules>
+                        <Foo_Bar before="Mage_Adminhtml">Foo_Bar_Adminhtml</Foo_Bar>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+     
+    <adminhtml>
+        <layout>
+            <updates>
+                <foo_bar>
+                    <!--
+                    We again keep a nice naming convention and make our module upgrade proof by placing it in a separate folder
+                    - Since we are in the adminhtml node, this will look for the XML file in the app/design/adminhtml/default/default root folder
+                    -->
+                    <file>foo/bar.xml</file>
+                </foo_bar>
+            </updates>
+        </layout>
+    </adminhtml>
+</config>
