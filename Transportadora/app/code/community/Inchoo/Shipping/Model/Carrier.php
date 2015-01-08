@@ -56,7 +56,7 @@ class Inchoo_Shipping_Model_Carrier
             return false;
         }
 
- Mage::getSingleton('core/session')->addNotice($request->getDestPostcode());
+// Mage::getSingleton('core/session')->addNotice($request->getDestPostcode());
  
         $this->_toZip   = $request->getDestPostcode();
 if ( $this->_toZip == '') {
@@ -133,7 +133,7 @@ if ( $this->_toZip == '') {
 		$resource = Mage::getSingleton('core/resource');
         $readConnection = $resource->getConnection('core_read');
 		$query = 'SELECT  preco *('. ($pesoCubicoTotal/1000000).'/fator) FROM '.$prefix.'foo_bar_baz where cepini <= '.$this->_toZip.' and cepfim >= '.$this->_toZip.'  limit 1';
-		Mage::getSingleton('core/session')->addNotice($query);
+		//Mage::getSingleton('core/session')->addNotice($query);
 		$valorfrete = $readConnection->fetchOne($query);
 		$query = 'SELECT  prazo FROM '.$prefix.'foo_bar_baz where cepini <= '.$this->_toZip.' and cepfim >= '.$this->_toZip.'  limit 1';
 		$prazo = $readConnection->fetchOne($query);
